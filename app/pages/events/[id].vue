@@ -22,7 +22,7 @@
             {{ getStatusText(event?.status) }}
           </div>
           <span class="text-sm text-base-content/60">Código: <span class="font-mono font-semibold">{{ event?.code
-          }}</span></span>
+              }}</span></span>
         </div>
 
         <!-- Informações principais em grid elegante -->
@@ -86,19 +86,164 @@
       </div>
     </div>
 
-    <!-- Tabs for Withdrawals and Returns -->
+    <!-- Tabs for Reservations, Withdrawals and Returns -->
     <div class="card bg-base-100 shadow-xl w-full">
       <div class="card-body">
         <div class="tabs tabs-boxed mb-4">
+          <a @click="activeTab = 'reserved'" :class="['tab', activeTab === 'reserved' ? 'tab-active' : '']">
+            📋 Reservados ({{ eventReservations.length }})
+          </a>
           <a @click="activeTab = 'tree'" :class="['tab', activeTab === 'tree' ? 'tab-active' : '']">
-            Visão em Árvore
+            🌳 Visão em Árvore
           </a>
           <a @click="activeTab = 'withdrawals'" :class="['tab', activeTab === 'withdrawals' ? 'tab-active' : '']">
-            Retiradas ({{ withdrawals.length }})
+            ⬆️ Retiradas ({{ withdrawals.length }})
           </a>
           <a @click="activeTab = 'returns'" :class="['tab', activeTab === 'returns' ? 'tab-active' : '']">
-            Devoluções ({{ returns.length }})
+            ⬇️ Devoluções ({{ returns.length }})
           </a>
+        </div>
+
+        <!-- Reserved Tab -->
+        <div v-if="activeTab === 'reserved'" class="space-y-6">
+          <!-- Sub-tabs for Equipment and Bags -->
+          <div class="tabs tabs-sm mb-4">
+            <a @click="reservedSubTab = 'equipment'"
+              :class="['tab tab-bordered', reservedSubTab === 'equipment' ? 'tab-active' : '']">
+              🎤 Equipamentos ({{ reservedEquipment.length }})
+            </a>
+            <a @click="reservedSubTab = 'bags'"
+              :class="['tab tab-bordered', reservedSubTab === 'bags' ? 'tab-active' : '']">
+              📦 Bags ({{ reservedBags.length }})
+            </a>
+          </div>
+
+          <!-- Reserved Equipment -->
+          <div v-if="reservedSubTab === 'equipment'" class="overflow-x-auto">
+            <table class="table table-zebra">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Equipamento</th>
+                  <th>Categoria</th>
+                  <th>Status</th>
+                  <th>Reservado por</th>
+                  <th>Período</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="reservation in reservedEquipment" :key="reservation.id">
+                  <td class="font-mono font-bold">{{ getEquipmentCode(reservation.equipment_id) }}</td>
+                  <td>{{ getEquipmentName(reservation.equipment_id) }}</td>
+                  <td>
+                    <span class="badge badge-outline">{{ getEquipmentCategory(reservation.equipment_id) }}</span>
+                  </td>
+                  <td>
+                    <div class="badge badge-sm" :class="getEquipmentStatusClass(reservation.equipment_id)">
+                      {{ getEquipmentStatusText(reservation.equipment_id) }}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <div class="avatar" :class="{ 'placeholder': !getAvatarByUserId(reservation.reserved_by) }">
+                        <div class="bg-neutral text-neutral-content rounded-full w-6 overflow-hidden">
+                          <img v-if="getAvatarByUserId(reservation.reserved_by)"
+                            :src="getAvatarByUserId(reservation.reserved_by)"
+                            :alt="getUserName(reservation.reserved_by)" class="w-full h-full object-cover" />
+                          <span v-else class="text-xs">{{ getUserName(reservation.reserved_by).charAt(0).toUpperCase()
+                          }}</span>
+                        </div>
+                      </div>
+                      <span class="text-sm">{{ getUserName(reservation.reserved_by) }}</span>
+                    </div>
+                  </td>
+                  <td class="text-sm">
+                    <div>{{ formatDateTime(reservation.start_date) }}</div>
+                    <div class="text-xs text-base-content/60">até {{ formatDateTime(reservation.end_date) }}</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-if="reservedEquipment.length === 0" class="text-center py-8 text-base-content/60">
+              Nenhum equipamento reservado para este evento
+            </div>
+          </div>
+
+          <!-- Reserved Bags -->
+          <div v-if="reservedSubTab === 'bags'" class="space-y-3">
+            <div v-for="reservation in reservedBags" :key="reservation.id"
+              class="collapse collapse-arrow bg-base-200 rounded-lg">
+              <input type="checkbox" />
+              <div class="collapse-title py-3">
+                <div class="flex items-center justify-between gap-4 w-full pr-6">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <span class="text-2xl">📦</span>
+                    <span class="font-bold text-lg truncate">{{ getBagName(reservation.bag_id) }}</span>
+                    <span class="text-sm text-base-content/60 font-mono">({{ getBagCode(reservation.bag_id) }})</span>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <div class="badge badge-info gap-1">🎤 {{ getBagEquipmentCount(reservation.bag_id) }}</div>
+                    <div class="badge badge-sm" :class="getBagStatusClass(reservation.bag_id)">
+                      {{ getBagStatusText(reservation.bag_id) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="collapse-content">
+                <div class="px-2 pb-2">
+                  <div class="flex items-center gap-2 mb-3 text-sm text-base-content/70">
+                    <span>Reservado por:</span>
+                    <div class="flex items-center gap-2">
+                      <div class="avatar" :class="{ 'placeholder': !getAvatarByUserId(reservation.reserved_by) }">
+                        <div class="bg-neutral text-neutral-content rounded-full w-5 overflow-hidden">
+                          <img v-if="getAvatarByUserId(reservation.reserved_by)"
+                            :src="getAvatarByUserId(reservation.reserved_by)"
+                            :alt="getUserName(reservation.reserved_by)" class="w-full h-full object-cover" />
+                          <span v-else class="text-xs">{{ getUserName(reservation.reserved_by).charAt(0).toUpperCase()
+                          }}</span>
+                        </div>
+                      </div>
+                      <span>{{ getUserName(reservation.reserved_by) }}</span>
+                    </div>
+                    <span class="mx-2">|</span>
+                    <span>{{ formatDateTime(reservation.start_date) }} até {{ formatDateTime(reservation.end_date)
+                    }}</span>
+                  </div>
+                </div>
+                <table class="table table-sm w-full">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Equipamento</th>
+                      <th>Categoria</th>
+                      <th class="text-center">Status</th>
+                      <th class="text-center">Condição</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="equip in getBagEquipment(reservation.bag_id)" :key="equip.id">
+                      <td class="font-mono">{{ equip.code }}</td>
+                      <td>{{ equip.name }}</td>
+                      <td>
+                        <span class="badge badge-outline badge-sm">{{ equip.category }}</span>
+                      </td>
+                      <td class="text-center">
+                        <span class="badge badge-sm" :class="getStatusClassDirect(equip.status)">{{
+                          getStatusTextDirect(equip.status) }}</span>
+                      </td>
+                      <td class="text-center">
+                        <span class="badge badge-sm" :class="getConditionClass(equip.condition)">{{
+                          getConditionText(equip.condition) }}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div v-if="reservedBags.length === 0" class="text-center py-8 text-base-content/60">
+              Nenhuma bag reservada para este evento
+            </div>
+          </div>
         </div>
 
         <!-- Tree View -->
@@ -128,6 +273,8 @@
                   <tr>
                     <th>Código</th>
                     <th>Equipamento</th>
+                    <th>Categoria</th>
+                    <th class="text-center">Status</th>
                     <th class="text-center">Retiradas</th>
                     <th class="text-center">Devoluções</th>
                     <th class="text-center">Pendente</th>
@@ -135,8 +282,15 @@
                 </thead>
                 <tbody>
                   <tr v-for="equip in bag.equipmentList" :key="equip.id">
-                    <td class="font-mono">{{ equip.code }}</td>
-                    <td>{{ equip.name }}</td>
+                    <td class="font-mono">{{ equip.code || '-' }}</td>
+                    <td>{{ equip.name || 'Equipamento não encontrado' }}</td>
+                    <td>
+                      <span class="badge badge-outline badge-sm">{{ equip.category || '-' }}</span>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge badge-sm" :class="getStatusClassDirect(equip.status)">{{
+                        getStatusTextDirect(equip.status) }}</span>
+                    </td>
                     <td class="text-center"><span class="badge badge-warning badge-sm">{{ equip.withdrawals }}</span>
                     </td>
                     <td class="text-center"><span class="badge badge-success badge-sm">{{ equip.returns }}</span></td>
@@ -153,8 +307,17 @@
             <div class="flex items-center justify-between gap-4">
               <div class="flex items-center gap-3 min-w-0">
                 <span class="text-2xl">🎤</span>
-                <span class="font-bold text-lg truncate">{{ equipment.name }}</span>
-                <span class="text-sm text-base-content/60 font-mono">({{ equipment.code }})</span>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-lg truncate">{{ equipment.name || 'Equipamento não encontrado' }}</span>
+                    <span class="text-sm text-base-content/60 font-mono">({{ equipment.code || '-' }})</span>
+                  </div>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="badge badge-outline badge-sm">{{ equipment.category || '-' }}</span>
+                    <span class="badge badge-sm" :class="getStatusClassDirect(equipment.status)">{{
+                      getStatusTextDirect(equipment.status) }}</span>
+                  </div>
+                </div>
               </div>
               <div class="flex flex-wrap gap-2 ml-16">
                 <div class="badge badge-warning gap-1">⬆️ {{ equipment.withdrawals }}</div>
@@ -202,7 +365,6 @@
                 <th>Data</th>
                 <th>Item</th>
                 <th>Usuário</th>
-                <th>Status</th>
                 <th>Observações</th>
               </tr>
             </thead>
@@ -245,28 +407,23 @@
                       <span>{{ getTransactionUser(transaction)?.username || getUserName(transaction.user_id) }}</span>
                     </div>
                   </td>
-                  <td>
-                    <div class="badge badge-sm" :class="getReturnStatusClass(transaction.status)">
-                      {{ getReturnStatusText(transaction.status) }}
-                    </div>
-                  </td>
                   <td class="text-sm">{{ transaction.notes || '-' }}</td>
                 </tr>
                 <!-- Equipamentos expandidos da bag -->
                 <template v-if="expandedWithdrawalBags.includes(bagGroup.bagId)">
-                  <tr v-for="transaction in bagGroup.transactions" :key="`w-${bagGroup.bagId}-${transaction.id}`"
+                  <tr v-for="row in getBagExpandedRows(bagGroup, 'withdrawal')" :key="`w-${bagGroup.bagId}-${row.key}`"
                     class="bg-base-200/30">
                     <td></td>
                     <td>
                       <span class="text-base-content/40">└─</span>
-                      {{ formatDateTime(transaction.scheduled_date || transaction.created_at) }}
+                      {{ formatDateTime(row.date) }}
                     </td>
                     <td>
                       <div class="flex items-center gap-2 pl-4">
                         <span class="text-sm">🎤</span>
                         <div>
-                          <div class="font-mono text-sm">{{ getEquipmentCode(transaction.equipment_id) }}</div>
-                          <div class="text-xs text-base-content/70">{{ getEquipmentName(transaction.equipment_id) }}
+                          <div class="font-mono text-sm">{{ getEquipmentCode(row.equipmentId) }}</div>
+                          <div class="text-xs text-base-content/70">{{ getEquipmentName(row.equipmentId) }}
                           </div>
                         </div>
                       </div>
@@ -274,25 +431,21 @@
                     <td class="text-sm">
                       <div class="flex items-center gap-2">
                         <div class="avatar"
-                          :class="{ 'placeholder': !getAvatarByUserId(getTransactionUser(transaction)?.id) }">
+                          :class="{ 'placeholder': !getAvatarByUserId(getTransactionUser(row.transaction)?.id) }">
                           <div class="bg-neutral text-neutral-content rounded-full w-6 overflow-hidden">
-                            <img v-if="getAvatarByUserId(getTransactionUser(transaction)?.id)"
-                              :src="getAvatarByUserId(getTransactionUser(transaction)?.id)"
-                              :alt="getTransactionUser(transaction)?.username || getUserName(transaction.user_id)"
+                            <img v-if="getAvatarByUserId(getTransactionUser(row.transaction)?.id)"
+                              :src="getAvatarByUserId(getTransactionUser(row.transaction)?.id)"
+                              :alt="getTransactionUser(row.transaction)?.username || getUserName(row.transaction?.user_id)"
                               class="w-full h-full object-cover" />
-                            <span v-else class="text-xs">{{ (getTransactionUser(transaction)?.username ||
-                              getUserName(transaction.user_id)).charAt(0).toUpperCase() }}</span>
+                            <span v-else class="text-xs">{{ (getTransactionUser(row.transaction)?.username ||
+                              getUserName(row.transaction?.user_id)).charAt(0).toUpperCase() }}</span>
                           </div>
                         </div>
-                        <span>{{ getTransactionUser(transaction)?.username || getUserName(transaction.user_id) }}</span>
+                        <span>{{ getTransactionUser(row.transaction)?.username || getUserName(row.transaction?.user_id)
+                          }}</span>
                       </div>
                     </td>
-                    <td>
-                      <div class="badge badge-sm" :class="getReturnStatusClass(transaction.status)">
-                        {{ getReturnStatusText(transaction.status) }}
-                      </div>
-                    </td>
-                    <td class="text-sm">{{ transaction.notes || '-' }}</td>
+                    <td class="text-sm">{{ row.transaction?.notes || '-' }}</td>
                   </tr>
                 </template>
               </template>
@@ -419,19 +572,19 @@
                 </tr>
                 <!-- Equipamentos expandidos da bag -->
                 <template v-if="expandedReturnBags.includes(bagGroup.bagId)">
-                  <tr v-for="transaction in bagGroup.transactions" :key="`r-${bagGroup.bagId}-${transaction.id}`"
+                  <tr v-for="row in getBagExpandedRows(bagGroup, 'return')" :key="`r-${bagGroup.bagId}-${row.key}`"
                     class="bg-base-200/30">
                     <td></td>
                     <td>
                       <span class="text-base-content/40">└─</span>
-                      {{ formatDateTime(transaction.actual_date || transaction.created_at) }}
+                      {{ formatDateTime(row.date) }}
                     </td>
                     <td>
                       <div class="flex items-center gap-2 pl-4">
                         <span class="text-sm">🎤</span>
                         <div>
-                          <div class="font-mono text-sm">{{ getEquipmentCode(transaction.equipment_id) }}</div>
-                          <div class="text-xs text-base-content/70">{{ getEquipmentName(transaction.equipment_id) }}
+                          <div class="font-mono text-sm">{{ getEquipmentCode(row.equipmentId) }}</div>
+                          <div class="text-xs text-base-content/70">{{ getEquipmentName(row.equipmentId) }}
                           </div>
                         </div>
                       </div>
@@ -439,25 +592,26 @@
                     <td class="text-sm">
                       <div class="flex items-center gap-2">
                         <div class="avatar"
-                          :class="{ 'placeholder': !getAvatarByUserId(getTransactionUser(transaction)?.id) }">
+                          :class="{ 'placeholder': !getAvatarByUserId(getTransactionUser(row.transaction)?.id) }">
                           <div class="bg-neutral text-neutral-content rounded-full w-6 overflow-hidden">
-                            <img v-if="getAvatarByUserId(getTransactionUser(transaction)?.id)"
-                              :src="getAvatarByUserId(getTransactionUser(transaction)?.id)"
-                              :alt="getTransactionUser(transaction)?.username || getUserName(transaction.user_id)"
+                            <img v-if="getAvatarByUserId(getTransactionUser(row.transaction)?.id)"
+                              :src="getAvatarByUserId(getTransactionUser(row.transaction)?.id)"
+                              :alt="getTransactionUser(row.transaction)?.username || getUserName(row.transaction?.user_id)"
                               class="w-full h-full object-cover" />
-                            <span v-else class="text-xs">{{ (getTransactionUser(transaction)?.username ||
-                              getUserName(transaction.user_id)).charAt(0).toUpperCase() }}</span>
+                            <span v-else class="text-xs">{{ (getTransactionUser(row.transaction)?.username ||
+                              getUserName(row.transaction?.user_id)).charAt(0).toUpperCase() }}</span>
                           </div>
                         </div>
-                        <span>{{ getTransactionUser(transaction)?.username || getUserName(transaction.user_id) }}</span>
+                        <span>{{ getTransactionUser(row.transaction)?.username || getUserName(row.transaction?.user_id)
+                          }}</span>
                       </div>
                     </td>
                     <td>
-                      <div class="badge badge-sm" :class="getReturnStatusClass(transaction.status)">
-                        {{ getReturnStatusText(transaction.status) }}
+                      <div class="badge badge-sm" :class="getReturnStatusClass(row.transaction?.status)">
+                        {{ getReturnStatusText(row.transaction?.status) }}
                       </div>
                     </td>
-                    <td class="text-sm">{{ transaction.notes || '-' }}</td>
+                    <td class="text-sm">{{ row.transaction?.notes || '-' }}</td>
                   </tr>
                 </template>
               </template>
@@ -508,18 +662,23 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="stat bg-base-100 shadow-xl rounded-lg">
-        <div class="stat-title">Total de Retiradas</div>
+        <div class="stat-title">📋 Reservados</div>
+        <div class="stat-value text-info">{{ eventReservations.length }}</div>
+        <div class="stat-desc">{{ reservedEquipment.length }} equip. | {{ reservedBags.length }} bags</div>
+      </div>
+      <div class="stat bg-base-100 shadow-xl rounded-lg">
+        <div class="stat-title">⬆️ Retiradas</div>
         <div class="stat-value text-warning">{{ withdrawals.length }}</div>
       </div>
       <div class="stat bg-base-100 shadow-xl rounded-lg">
-        <div class="stat-title">Total de Devoluções</div>
+        <div class="stat-title">⬇️ Devoluções</div>
         <div class="stat-value text-success">{{ returns.length }}</div>
       </div>
       <div class="stat bg-base-100 shadow-xl rounded-lg">
-        <div class="stat-title">Pendentes</div>
-        <div class="stat-value text-error">{{ withdrawals.length - returns.length }}</div>
+        <div class="stat-title">⏳ Pendentes</div>
+        <div class="stat-value text-error">{{ Math.max(0, withdrawals.length - returns.length) }}</div>
       </div>
     </div>
 
@@ -556,7 +715,7 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
-import type { Event, EventStatus, TransactionStatus } from '~/types'
+import type { Event, EventStatus, TransactionStatus, Transaction } from '~/types'
 import { formatDateTimeBR } from "~/utils/dateUtils";
 import { useUserAvatar } from "~/composables/useUserAvatar";
 
@@ -571,7 +730,8 @@ const { getAvatarByUserId } = useUserAvatar()
 
 const eventId = computed(() => route.params.id as string)
 const event = ref<Event | null>(null)
-const activeTab = ref<'tree' | 'withdrawals' | 'returns'>('tree')
+const activeTab = ref<'reserved' | 'tree' | 'withdrawals' | 'returns'>('reserved')
+const reservedSubTab = ref<'equipment' | 'bags'>('equipment')
 const showEditModal = ref(false)
 
 const goBack = () => {
@@ -613,7 +773,8 @@ onMounted(async () => {
     appStore.fetchTransactions(),
     appStore.fetchEquipment(),
     appStore.fetchUsers(),
-    appStore.fetchBags()
+    appStore.fetchBags(),
+    appStore.fetchReservations()
   ])
 
   // Buscar evento pelo ID
@@ -632,6 +793,21 @@ onMounted(async () => {
       description: event.value.description || ''
     }
   }
+})
+
+// Computed para reservas do evento
+const eventReservations = computed(() => {
+  return appStore.reservations.filter(r =>
+    r.event_id === eventId.value && r.status === 'active'
+  )
+})
+
+const reservedEquipment = computed(() => {
+  return eventReservations.value.filter(r => r.equipment_id && !r.bag_id)
+})
+
+const reservedBags = computed(() => {
+  return eventReservations.value.filter(r => r.bag_id)
 })
 
 // Computed para transações de retirada e devolução
@@ -829,6 +1005,35 @@ const getBagEquipment = (bagId: string | undefined) => {
   return appStore.equipment.filter(e => e.bag_id === bagId)
 }
 
+const getBagExpandedRows = (
+  bagGroup: { bagId: string; transactions: Transaction[]; latestDate: string },
+  mode: 'withdrawal' | 'return'
+) => {
+  const equipmentTransactions = bagGroup.transactions.filter(t => t.equipment_id)
+  if (equipmentTransactions.length > 0) {
+    return equipmentTransactions.map(t => ({
+      key: t.id,
+      equipmentId: t.equipment_id as string,
+      date: mode === 'return'
+        ? (t.actual_date || t.created_at || bagGroup.latestDate)
+        : (t.scheduled_date || t.created_at || bagGroup.latestDate),
+      transaction: t
+    }))
+  }
+
+  const fallbackTransaction = bagGroup.transactions[0]
+  const fallbackDate = mode === 'return'
+    ? (fallbackTransaction?.actual_date || fallbackTransaction?.created_at || bagGroup.latestDate)
+    : (fallbackTransaction?.scheduled_date || fallbackTransaction?.created_at || bagGroup.latestDate)
+
+  return getBagEquipment(bagGroup.bagId).map(e => ({
+    key: `${bagGroup.bagId}-${e.id}`,
+    equipmentId: e.id,
+    date: fallbackDate,
+    transaction: fallbackTransaction
+  }))
+}
+
 const filteredWithdrawals = computed(() => {
   const query = withdrawalFilters.value.query.trim().toLowerCase()
   const from = withdrawalFilters.value.from ? new Date(withdrawalFilters.value.from) : null
@@ -912,8 +1117,11 @@ const equipmentTree = computed(() => {
       const equipment = appStore.getEquipmentById(equipId)
       equipmentMap.set(equipId, {
         id: equipId,
-        name: equipment?.name || 'Desconhecido',
-        code: equipment?.code || '',
+        name: equipment?.name || 'Equipamento não encontrado',
+        code: equipment?.code || '-',
+        category: equipment?.category || '-',
+        status: equipment?.status || 'unknown',
+        condition: equipment?.condition || 'unknown',
         bag_id: equipment?.bag_id || null,
         withdrawals: 0,
         returns: 0,
@@ -937,8 +1145,11 @@ const equipmentTree = computed(() => {
       const equipment = appStore.getEquipmentById(equipId)
       equipmentMap.set(equipId, {
         id: equipId,
-        name: equipment?.name || 'Desconhecido',
-        code: equipment?.code || '',
+        name: equipment?.name || 'Equipamento não encontrado',
+        code: equipment?.code || '-',
+        category: equipment?.category || '-',
+        status: equipment?.status || 'unknown',
+        condition: equipment?.condition || 'unknown',
         bag_id: equipment?.bag_id || null,
         withdrawals: 0,
         returns: 0,
@@ -983,8 +1194,8 @@ const bagsTree = computed(() => {
       const bagEquipments = appStore.equipment.filter(e => e.bag_id === bagId)
       bagMap.set(bagId, {
         id: bagId,
-        name: bag?.name || 'Bag Desconhecida',
-        code: bag?.code || '',
+        name: bag?.name || 'Bag não encontrada',
+        code: bag?.code || '-',
         equipmentCount: bagEquipments.length,
         withdrawals: 0,
         returns: 0,
@@ -993,6 +1204,9 @@ const bagsTree = computed(() => {
           id: eq.id,
           code: eq.code,
           name: eq.name,
+          category: eq.category,
+          status: eq.status,
+          condition: eq.condition,
           bag_id: eq.bag_id,
           withdrawals: 0,
           returns: 0,
@@ -1018,8 +1232,8 @@ const bagsTree = computed(() => {
       const bagEquipments = appStore.equipment.filter(e => e.bag_id === bagId)
       bagMap.set(bagId, {
         id: bagId,
-        name: bag?.name || 'Bag Desconhecida',
-        code: bag?.code || '',
+        name: bag?.name || 'Bag não encontrada',
+        code: bag?.code || '-',
         equipmentCount: bagEquipments.length,
         withdrawals: 0,
         returns: 0,
@@ -1028,6 +1242,9 @@ const bagsTree = computed(() => {
           id: eq.id,
           code: eq.code,
           name: eq.name,
+          category: eq.category,
+          status: eq.status,
+          condition: eq.condition,
           bag_id: eq.bag_id,
           withdrawals: 0,
           returns: 0,
@@ -1050,15 +1267,27 @@ const bagsTree = computed(() => {
 
     if (!bagMap.has(eq.bag_id)) {
       const bag = appStore.getBagById(eq.bag_id)
+      const bagEquipments = appStore.equipment.filter(e => e.bag_id === eq.bag_id)
       bagMap.set(eq.bag_id, {
         id: eq.bag_id,
-        name: bag?.name || 'Bag Desconhecida',
-        code: bag?.code || '',
-        equipmentCount: 0,
+        name: bag?.name || 'Bag não encontrada',
+        code: bag?.code || '-',
+        equipmentCount: bagEquipments.length,
         withdrawals: 0,
         returns: 0,
         pending: 0,
-        equipmentList: []
+        equipmentList: bagEquipments.map(e => ({
+          id: e.id,
+          code: e.code,
+          name: e.name,
+          category: e.category,
+          status: e.status,
+          condition: e.condition,
+          bag_id: e.bag_id,
+          withdrawals: 0,
+          returns: 0,
+          pending: 0
+        }))
       })
     }
 
@@ -1071,8 +1300,15 @@ const bagsTree = computed(() => {
       existingEquip.returns += eq.returns
       existingEquip.pending = Math.max(0, existingEquip.withdrawals - existingEquip.returns)
     } else {
+      // Buscar dados completos do equipamento do store
+      const fullEquip = appStore.getEquipmentById(eq.id)
       bagItem.equipmentCount++
-      bagItem.equipmentList.push(eq)
+      bagItem.equipmentList.push({
+        ...eq,
+        category: fullEquip?.category || eq.category || '-',
+        status: fullEquip?.status || eq.status || 'unknown',
+        condition: fullEquip?.condition || eq.condition || 'unknown'
+      })
     }
 
     bagItem.withdrawals += eq.withdrawals
@@ -1116,6 +1352,92 @@ const getEquipmentCode = (equipmentId: string | undefined) => {
   if (!equipmentId) return ''
   const equipment = appStore.getEquipmentById(equipmentId)
   return equipment?.code || ''
+}
+
+const getEquipmentCategory = (equipmentId: string | undefined) => {
+  if (!equipmentId) return '-'
+  const equipment = appStore.getEquipmentById(equipmentId)
+  return equipment?.category || '-'
+}
+
+const getEquipmentStatusClass = (equipmentId: string | undefined) => {
+  if (!equipmentId) return 'badge-ghost'
+  const equipment = appStore.getEquipmentById(equipmentId)
+  return getStatusClassDirect(equipment?.status)
+}
+
+const getEquipmentStatusText = (equipmentId: string | undefined) => {
+  if (!equipmentId) return 'N/A'
+  const equipment = appStore.getEquipmentById(equipmentId)
+  return getStatusTextDirect(equipment?.status)
+}
+
+const getStatusClassDirect = (status: string | undefined) => {
+  const classes: Record<string, string> = {
+    available: 'badge-success',
+    reserved: 'badge-info',
+    in_use: 'badge-warning',
+    maintenance: 'badge-error',
+    excluded: 'badge-neutral'
+  }
+  return classes[status || ''] || 'badge-ghost'
+}
+
+const getStatusTextDirect = (status: string | undefined) => {
+  const texts: Record<string, string> = {
+    available: 'Disponível',
+    reserved: 'Reservado',
+    in_use: 'Em Uso',
+    maintenance: 'Manutenção',
+    excluded: 'Excluído'
+  }
+  return texts[status || ''] || 'N/A'
+}
+
+const getConditionClass = (condition: string | undefined) => {
+  const classes: Record<string, string> = {
+    excellent: 'badge-success',
+    good: 'badge-info',
+    fair: 'badge-warning',
+    poor: 'badge-error',
+    damaged: 'badge-error'
+  }
+  return classes[condition || ''] || 'badge-ghost'
+}
+
+const getConditionText = (condition: string | undefined) => {
+  const texts: Record<string, string> = {
+    excellent: 'Excelente',
+    good: 'Bom',
+    fair: 'Regular',
+    poor: 'Ruim',
+    damaged: 'Danificado'
+  }
+  return texts[condition || ''] || 'N/A'
+}
+
+const getBagStatusClass = (bagId: string | undefined) => {
+  if (!bagId) return 'badge-ghost'
+  const bag = appStore.getBagById(bagId)
+  const classes: Record<string, string> = {
+    available: 'badge-success',
+    reserved: 'badge-info',
+    in_use: 'badge-warning',
+    excluded: 'badge-neutral'
+  }
+  return classes[bag?.status || ''] || 'badge-ghost'
+}
+
+const getBagStatusText = (bagId: string | undefined) => {
+  if (!bagId) return 'N/A'
+  const bag = appStore.getBagById(bagId)
+  const texts: Record<string, string> = {
+    available: 'Disponível',
+    reserved: 'Reservado',
+    in_use: 'Em Uso',
+    excluded: 'Excluído'
+  }
+  return texts[bag?.status || ''] || 'N/A'
 }
 
 const formatDateTime = (date: string | undefined) => formatDateTimeBR(date);
