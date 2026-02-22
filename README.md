@@ -1,91 +1,94 @@
-# 🎵 Asset Manager - Sistema de Gerenciamento de Ativos
+# Asset Manager - Sistema de Gerenciamento de Ativos
 
-Sistema completo de gerenciamento de ativos para empresas que alugam equipamentos de áudio para eventos e shows artísticos.
+Sistema completo de gerenciamento de ativos para empresas que alugam equipamentos de audio para eventos e shows artisticos.
 
-## ✨ Funcionalidades Implementadas
+## Funcionalidades Implementadas
 
-### 🔐 Autenticação & Autorização
-- ✅ Sistema de Login e Cadastro
-- ✅ Dois tipos de usuários (Admin e Funcionário)
-- ✅ Persistência de sessão em localStorage
-- ✅ Proteção de rotas com middleware
-- ✅ Usuário de teste: **user: admin | psw: admin**
+### Autenticacao & Autorizacao
+- Sistema de Login e Cadastro
+- Dois tipos de usuarios (Admin e Funcionario)
+- Persistencia de sessao em localStorage
+- Protecao de rotas com middleware
+- Usuario de teste: **user: lucas | psw: admin**
 
-### 📊 Dashboard
-- ✅ Cards com estatísticas (Eventos, Equipamentos disponíveis, em uso, em manutenção, danificados)
-- ✅ Lista de equipamentos com busca e filtros
-- ✅ Tabela de últimas 12 movimentações
-- ✅ Modal de detalhes de equipamentos
+### Dashboard
+- Cards com estatisticas (Eventos, Equipamentos disponiveis, em uso, em manutencao, danificados)
+- Lista de equipamentos com busca e filtros
+- Tabela de ultimas 12 movimentacoes
+- Modal de detalhes de equipamentos
 
-### 📅 Eventos
-- ✅ Calendário dinâmico com múltiplas visualizações (Mês, Semana, Dia, Lista)
-- ✅ CRUD completo de eventos
-- ✅ Visualização de eventos programados e ativos
-- ✅ Detalhes de cada evento com equipamentos associados
+### Eventos
+- Calendario dinamico com multiplas visualizacoes (Mes, Semana, Dia, Lista)
+- CRUD completo de eventos
+- Visualizacao de eventos programados e ativos
+- Detalhes de cada evento com equipamentos associados
 
-### 📤 Retirada (Withdrawal)
-- ✅ Fluxo em 3 etapas
-- ✅ Seleção de evento
-- ✅ Scanner QR Code (via câmera ou entrada manual)
-- ✅ Registro automático com data, hora e usuário
-- ✅ Histórico de retiradas recentes
+### Retirada (Withdrawal)
+- Fluxo em 3 etapas
+- Selecao de evento
+- Scanner QR Code (via camera ou entrada manual)
+- Registro automatico com data, hora e usuario
+- Historico de retiradas recentes
 
-### 📥 Devolução (Return)
-- ✅ Fluxo em 3 etapas
-- ✅ Seleção de evento
-- ✅ Scanner QR Code (via câmera ou entrada manual)
-- ✅ Status da devolução (OK, Avariado, Manutenção, Danificado)
-- ✅ Atualização automática do status
-- ✅ Histórico de devoluções
+### Devolucao (Return)
+- Fluxo em 3 etapas
+- Selecao de evento
+- Scanner QR Code (via camera ou entrada manual)
+- Status da devolucao (OK, Avariado, Manutencao, Danificado)
+- Atualizacao automatica do status
+- Historico de devolucoes
 
-### 📈 Relatórios Avançados
-- ✅ Equipamentos fora do estoque
-- ✅ Equipamentos em manutenção
-- ✅ Equipamentos mais utilizados (ranking)
-- ✅ Equipamentos parados há muito tempo
-- ✅ Resumo geral com cards principais
-- ✅ Resumo por evento
+### Relatorios Avancados
+- Equipamentos fora do estoque
+- Equipamentos em manutencao
+- Equipamentos mais utilizados (ranking)
+- Equipamentos parados ha muito tempo
+- Resumo geral com cards principais
+- Resumo por evento
 
-### 👥 Colaboradores
-- ✅ Cards com foto e informações dos funcionários
-- ✅ Campo de pesquisa por nome
-- ✅ Estatísticas de atividades por colaborador
-- ✅ Modal de detalhes com histórico de transações
+### Colaboradores
+- Cards com foto e informacoes dos funcionarios
+- Campo de pesquisa por nome
+- Estatisticas de atividades por colaborador
+- Modal de detalhes com historico de transacoes
 
-### 👤 Perfil
-- ✅ Edição de dados pessoais
-- ✅ Alteração de foto/avatar
-- ✅ Alteração de senha
-- ✅ Visualização de atividades recentes
+### Perfil
+- Edicao de dados pessoais
+- Alteracao de foto/avatar
+- Alteracao de senha
+- Visualizacao de atividades recentes
 
-### ⚙️ Painel Administrativo
-- ✅ CRUD de equipamentos
-- ✅ CRUD de usuários
-- ✅ Configurações do sistema
-- ✅ Exportação de dados
-- ✅ Zona de perigo para operações críticas
-- ✅ Acesso restrito a admins
+### Painel Administrativo
+- CRUD de equipamentos
+- CRUD de usuarios
+- Configuracoes do sistema
+- Exportacao de dados
+- Zona de perigo para operacoes criticas
+- Acesso restrito a admins
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **Nuxt 4** (^4.3.0) - Framework Vue.js com SSR
 - **Vue 3** (^3.5.27) - Framework JavaScript reativo
-- **Tailwind CSS** - Estilização utility-first
+- **Tailwind CSS** - Estilizacao utility-first
 - **DaisyUI** - Componentes UI para Tailwind
 - **Pinia** - Gerenciamento de estado
-- **jsQR** - Leitura de códigos QR
-- **TypeScript** - Tipagem estática
+- **jsQR** - Leitura de codigos QR
+- **TypeScript** - Tipagem estatica
+- **Vitest** - Testes unitarios
+- **Playwright** - Testes E2E
 
-## 📱 Temas Disponíveis
+## Temas Disponiveis
 
 - Light
 - Dark
 - Acid
 - Silk
+- Synthwave (padrao)
 
-## 🚀 Como Executar
+## Como Executar
 
-1. **Instalar dependências:**
+1. **Instalar dependencias:**
 ```bash
 npm install
 ```
@@ -95,7 +98,7 @@ npm install
 npm run dev
 ```
 
-3. **Build para produção:**
+3. **Build para producao:**
 ```bash
 npm run build
 ```
@@ -105,120 +108,131 @@ npm run build
 npm run preview
 ```
 
-## 🔑 Credenciais de Teste
+## Credenciais de Teste
 
 **Administrador:**
-- Usuário: `admin`
+- Usuario: `lucas`
 - Senha: `admin`
 
-**Funcionários (exemplo):**
-- Email: `joao@example.com`
-- Senha: `123456`
+## Testes
 
-## 📂 Estrutura do Projeto
+O projeto possui uma suíte completa de testes.
+
+### Testes Unitarios (Vitest) - 13 testes
+```bash
+npm run test              # Executar testes
+npm run test:watch        # Modo watch
+npm run test:coverage     # Com cobertura
+```
+
+### Testes E2E (Playwright) - 8 testes
+```bash
+npm run test:e2e          # Executar testes E2E
+npm run test:e2e:ui       # Interface grafica
+npm run test:e2e:debug    # Modo debug
+npm run test:e2e:report   # Ver relatorio HTML
+```
+
+### Arquivos de Teste
+```
+tests/
+├── unit/
+│   └── components/
+│       ├── FormInput.test.ts   # 6 testes
+│       ├── Modal.test.ts       # 3 testes
+│       └── StatCard.test.ts    # 4 testes
+e2e/
+├── auth.spec.ts                # 4 testes de autenticacao
+└── dashboard.spec.ts           # 4 testes do dashboard
+```
+
+## Estrutura do Projeto
 
 ```
 nuxt-app/
 ├── app/
-│   └── app.vue                 # Componente raiz
+│   ├── app.vue                 # Componente raiz
+│   ├── components/             # Componentes reutilizaveis
+│   ├── composables/            # Logica de dominio
+│   ├── layouts/                # Layouts de pagina
+│   ├── middleware/             # Middleware de rotas
+│   ├── pages/                  # Paginas da aplicacao
+│   ├── services/               # Chamadas API
+│   ├── stores/                 # Estado global (Pinia)
+│   └── utils/                  # Funcoes utilitarias
+├── tests/
+│   └── unit/                   # Testes unitarios
+├── e2e/                        # Testes E2E
 ├── assets/
 │   └── css/
-│       └── main.css           # Estilos globais
-├── components/
-│   ├── FormInput.vue          # Input reutilizável
-│   ├── FormSelect.vue         # Select reutilizável
-│   ├── FormTextarea.vue       # Textarea reutilizável
-│   ├── Modal.vue              # Modal reutilizável
-│   ├── StatCard.vue           # Card de estatística
-│   └── QRScanner.vue          # Scanner QR Code
-├── layouts/
-│   └── default.vue            # Layout principal
-├── middleware/
-│   ├── auth.ts                # Middleware de autenticação
-│   └── admin.ts               # Middleware de admin
-├── pages/
-│   ├── index.vue              # Dashboard
-│   ├── login.vue              # Login
-│   ├── register.vue           # Registro
-│   ├── events.vue             # Eventos
-│   ├── withdrawal.vue         # Retirada
-│   ├── return.vue             # Devolução
-│   ├── reports.vue            # Relatórios
-│   ├── employees.vue          # Colaboradores
-│   ├── profile.vue            # Perfil
-│   └── admin.vue              # Painel Admin
-├── stores/
-│   ├── auth.ts                # Store de autenticação
-│   └── app.ts                 # Store da aplicação
-├── utils/
-│   └── mockData.ts            # Dados de exemplo
-├── nuxt.config.ts             # Configuração Nuxt
-├── tailwind.config.js         # Configuração Tailwind
-└── package.json               # Dependências
+│       └── main.css            # Estilos globais
+├── nuxt.config.ts              # Configuracao Nuxt
+├── tailwind.config.js          # Configuracao Tailwind
+├── vitest.config.ts            # Configuracao Vitest
+├── playwright.config.ts        # Configuracao Playwright
+└── package.json                # Dependencias
 ```
 
-## 💡 Funcionalidades Técnicas
+## Funcionalidades Tecnicas
 
-### Componentes Reutilizáveis
-- FormInput, FormSelect, FormTextarea com validação
-- Modal dinâmico com slots
+### Componentes Reutilizaveis
+- FormInput, FormSelect, FormTextarea com validacao
+- Modal dinamico com slots
 - Scanner QR Code funcional
 
 ### State Management
 - Pinia para gerenciamento de estado global
-- Stores separados para autenticação e dados da aplicação
+- Stores separados para autenticacao e dados da aplicacao
 
-### Segurança
-- Middleware de autenticação
-- Middleware de autorização (admin)
-- Validação de formulários
-- Proteção de rotas
+### Seguranca
+- Middleware de autenticacao
+- Middleware de autorizacao (admin)
+- Validacao de formularios
+- Protecao de rotas
 
 ### Responsividade
 - Design mobile-first
 - Breakpoints: mobile (375px+), tablet (768px), desktop (1366px+)
-- Grid adaptável
-- Navegação responsiva
+- Grid adaptavel
+- Navegacao responsiva
 
-## 📊 Dados Mock Incluídos
+## Integracao com Backend
 
-O sistema vem com dados de exemplo pré-carregados:
-- 6 usuários (1 admin + 5 funcionários)
-- 12 equipamentos variados
-- 5 eventos programados
-- 5 transações de exemplo
+Este frontend esta integrado com a API FastAPI localizada em `/api`.
 
-## 🎯 Próximas Melhorias Sugeridas
+Configure a URL da API em `.env`:
+```
+NUXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-- [ ] Integração com backend real
-- [ ] Notificações push
-- [ ] Geração de relatórios em PDF
-- [ ] Gráficos e visualizações avançadas
-- [ ] Sistema de mensagens entre usuários
-- [ ] Integração com APIs de pagamento
+## Proximas Melhorias
+
+- [ ] Notificacoes push
+- [ ] Geracao de relatorios em PDF
+- [ ] Graficos e visualizacoes avancadas
+- [ ] Sistema de mensagens entre usuarios
+- [ ] Integracao com APIs de pagamento
 - [ ] Upload de fotos de equipamentos
-- [ ] Sistema de backup automático
+- [ ] Sistema de backup automatico
 
-## 📝 Notas Importantes
+## Notas Importantes
 
-- Este é um protótipo frontend com dados mockados
-- Para produção, conecte com um backend real
-- Os dados são salvos apenas no localStorage
-- O scanner QR Code requer permissão de câmera
+- O scanner QR Code requer permissao de camera
+- Testes E2E requerem a API rodando em localhost:8000
+- Dados de teste sao criados automaticamente no banco SQLite
 
-## 🤝 Contribuindo
+## Contribuindo
 
-Este projeto foi criado como um sistema completo de gerenciamento. Sinta-se livre para:
+Sinta-se livre para:
 - Reportar bugs
 - Sugerir novas funcionalidades
 - Enviar pull requests
-- Melhorar a documentação
+- Melhorar a documentacao
 
-## 📄 Licença
+## Licenca
 
-Este projeto é open source e está disponível sob a licença MIT.
+Este projeto e open source e esta disponivel sob a licenca MIT.
 
 ---
 
-Desenvolvido com ❤️ usando Nuxt 4 e Tailwind CSS
-
+Desenvolvido com Nuxt 4 e Tailwind CSS
