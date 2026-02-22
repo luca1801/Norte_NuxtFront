@@ -135,7 +135,7 @@
     </button>
 
     <!-- Main content area -->
-    <div class="min-h-screen transition-[padding] duration-200"
+    <div class="min-h-screen flex flex-col transition-[padding] duration-200"
       :class="isLgUp ? (isCollapsed ? 'pl-20' : 'pl-72') : 'pl-0'">
 
       <!-- User menu fixo no canto superior direito -->
@@ -175,7 +175,7 @@
         </div>
       </div>
 
-      <main class="p-3 md:p-4 pt-16">
+      <main class="p-3 md:p-4 pt-16 flex-grow">
         <slot />
       </main>
 
@@ -242,8 +242,8 @@ const getRoleText = (role?: string) => {
   return texts[role || ''] || role || 'Desconhecido'
 }
 
-const themes = ['light', 'dark', 'acid', 'silk']
-const currentTheme = ref('light')
+const themes = ['light', 'dark', 'acid', 'silk', 'synthwave']
+const currentTheme = ref('synthwave')
 const sidebarCollapsed = ref(false)
 const mobileSidebarOpen = ref(false)
 
@@ -312,7 +312,7 @@ const closeMobileSidebar = () => {
 
 onMounted(() => {
   if (!process.client) return
-  currentTheme.value = localStorage.getItem('theme') || 'light'
+  currentTheme.value = localStorage.getItem('theme') || 'synthwave'
 
   const savedCollapsed = localStorage.getItem('sidebar-collapsed')
   if (savedCollapsed !== null) sidebarCollapsed.value = savedCollapsed === 'true'

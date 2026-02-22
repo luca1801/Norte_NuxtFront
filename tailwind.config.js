@@ -10,7 +10,7 @@ export default {
   plugins: [
     daisyui({
       logs: false,
-      themes: ["light --default", "dark --prefersdark", "acid", "silk"],
+      themes: ["light", "dark --prefersdark", "acid", "silk", "synthwave --default"],
     }),
   ],
 };
