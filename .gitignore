@@ -25,5 +25,4 @@ logs
 
 # Testing
 playwright-report/
-playwright-report/*
 test-results/
