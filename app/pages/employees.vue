@@ -248,23 +248,25 @@ const getEventName = (eventId: string | undefined) => {
 }
 
 const getRoleBadgeClass = (role: string | undefined) => {
+  const r = role?.toLowerCase() || ''
   const classes: Record<string, string> = {
     admin: 'badge-primary',
     manager: 'badge-secondary',
     operator: 'badge-accent',
     viewer: 'badge-ghost'
   }
-  return classes[role || ''] || 'badge-ghost'
+  return classes[r] || 'badge-ghost'
 }
 
 const getRoleText = (role: string | undefined) => {
+  const r = role?.toLowerCase() || ''
   const texts: Record<string, string> = {
     admin: 'Administrador',
     manager: 'Gerente',
     operator: 'Operador',
     viewer: 'Visualizador'
   }
-  return texts[role || ''] || role || 'N/A'
+  return texts[r] || r || 'N/A'
 }
 
 // Função para buscar avatar de um usuário específico do localStorage

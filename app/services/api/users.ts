@@ -15,15 +15,10 @@ export const userService = {
   async getAll(params?: UserFilters): Promise<User[]> {
     const { fetch } = useApi();
     try {
-      // Try admin endpoint first (full user data)
       return await fetch<User[]>("/users/", { params });
     } catch (error: any) {
-      // If forbidden, try public endpoint (basic user data)
-      if (error?.statusCode === 403 || error?.status === 403) {
-        console.log("Admin endpoint forbidden, using public endpoint");
-        return await fetch<User[]>("/users/public", { params });
-      }
-      throw error;
+      console.log("Admin endpoint error, trying public endpoint:", error?.statusCode);
+      return await fetch<User[]>("/users/public", { params });
     }
   },
 

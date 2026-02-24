@@ -208,13 +208,14 @@ const getRoleBadgeClass = (role?: string) => {
 }
 
 const getRoleText = (role?: string) => {
+  const r = role?.toLowerCase() || ''
   const texts: Record<string, string> = {
     admin: 'Admin',
     manager: 'Gerente',
     operator: 'Operador',
     viewer: 'Visualizador',
   }
-  return texts[role || ''] || role || 'Desconhecido'
+  return texts[r] || r || 'Desconhecido'
 }
 
 const themes = ['light', 'dark', 'acid', 'silk', 'synthwave']

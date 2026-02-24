@@ -1575,23 +1575,25 @@ const getBagStatusText = (status: string) => {
 };
 
 const getRoleBadgeClass = (role: string) => {
+  const r = role?.toLowerCase() || ''
   const classes: Record<string, string> = {
     admin: "badge-primary",
     manager: "badge-secondary",
     operator: "badge-accent",
     viewer: "badge-ghost",
   };
-  return classes[role] || "badge-ghost";
+  return classes[r] || "badge-ghost";
 };
 
 const getRoleText = (role: string) => {
+  const r = role?.toLowerCase() || ''
   const texts: Record<string, string> = {
     admin: "Administrador",
     manager: "Gerente",
     operator: "Operador",
     viewer: "Visualizador",
   };
-  return texts[role] || role;
+  return texts[r] || r;
 };
 
 // ===== BAG FUNCTIONS =====

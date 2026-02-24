@@ -8,8 +8,12 @@ const PUBLIC_PATHS = [
 ]
 
 const ADMIN_PATHS = [
-  '/api/users',
+  '/api/users/',
   '/api/reports/audit-log'
+]
+
+const PUBLIC_USER_PATHS = [
+  '/api/users/public'
 ]
 
 export default defineEventHandler(async (event) => {
@@ -34,6 +38,10 @@ export default defineEventHandler(async (event) => {
   }
 
   event.context.authToken = token
+
+  if (PUBLIC_USER_PATHS.includes(path)) {
+    return
+  }
 
   if (ADMIN_PATHS.some(p => path.startsWith(p))) {
     const config = useRuntimeConfig(event)
