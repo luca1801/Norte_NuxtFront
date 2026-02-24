@@ -49,6 +49,7 @@
                   <th>Categoria</th>
                   <th>Bag</th>
                   <th>Status</th>
+                  <th>Evento</th>
                   <th>Ações</th>
                 </tr>
               </thead>
@@ -69,6 +70,14 @@
                     <div class="badge" :class="getEquipmentStatusClass(equipment.status)">
                       {{ getEquipmentStatusText(equipment.status) }}
                     </div>
+                  </td>
+                  <td>
+                    <div v-if="['in_use', 'reserved'].includes(equipment.status) && equipment.current_event_id" 
+                         class="badge badge-warning gap-1">
+                      <span>📅</span>
+                      <span>{{ getEventName(equipment.current_event_id) }}</span>
+                    </div>
+                    <span v-else class="text-base-content/40">-</span>
                   </td>
                   <td>
                     <div class="flex gap-1">
@@ -140,6 +149,12 @@
                     <div class="badge" :class="getBagStatusClass(bag.status)">
                       {{ getBagStatusText(bag.status) }}
                     </div>
+                    <div v-if="['in_use', 'reserved'].includes(bag.status) && bag.current_event_id" 
+                         class="badge badge-warning gap-1">
+                      <span>📅</span>
+                      <span>{{ getEventName(bag.current_event_id) }}</span>
+                    </div>
+                    <span v-else class="text-base-content/40">-</span>
                   </div>
                 </div>
               </div>
@@ -241,46 +256,150 @@
             </select>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="table table-zebra">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Nome</th>
-                  <th>Tipo</th>
-                  <th>Data</th>
-                  <th>Local</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="event in filteredEvents" :key="event.id">
-                  <td class="font-mono font-bold">{{ event.code }}</td>
-                  <td>{{ event.name }}</td>
-                  <td>
+          <div v-if="filteredEvents.length === 0" class="text-center py-8">
+            <div class="text-5xl mb-4">📅</div>
+            <p class="text-base-content/60">Nenhum evento encontrado</p>
+          </div>
+
+          <div v-else class="space-y-4">
+            <div v-for="event in filteredEvents" :key="event.id" class="collapse collapse-arrow bg-base-200">
+              <input type="checkbox" :id="`event-${event.id}`" />
+              <div class="collapse-title">
+                <div class="flex justify-between items-center pr-8">
+                  <div class="flex items-center gap-4">
+                    <div class="avatar placeholder">
+                      <div class="bg-secondary text-secondary-content rounded-lg w-12">
+                        <span class="text-lg">📅</span>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 class="font-bold text-lg">{{ event.name }}</h3>
+                      <p class="text-sm text-base-content/60 font-mono">{{ event.code }}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-4">
                     <div class="badge badge-ghost">{{ event.type }}</div>
-                  </td>
-                  <td>{{ formatEventDate(event.start_date) }}</td>
-                  <td>{{ event.location || '-' }}</td>
-                  <td>
                     <div class="badge" :class="getEventStatusClass(event.status)">
                       {{ getEventStatusText(event.status) }}
                     </div>
-                  </td>
-                  <td>
-                    <div class="flex gap-1">
-                      <button @click="editEvent(event)" class="btn btn-ghost btn-xs">
-                        ✏️
-                      </button>
-                      <button @click="deleteEvent(event.id)" class="btn btn-ghost btn-xs text-error">
-                        🗑️
-                      </button>
+                    <div class="text-sm text-base-content/60">
+                      {{ formatEventDate(event.start_date) }}
                     </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </div>
+              </div>
+              <div class="collapse-content">
+                <div class="pt-4">
+                  <div class="tabs tabs-boxed mb-4">
+                    <a :class="['tab', eventTab === 'reserved' + event.id ? 'tab-active' : '']" 
+                       @click="eventTab = 'reserved' + event.id">
+                      Reservados ({{ getReservedForEvent(event.id).length }})
+                    </a>
+                    <a :class="['tab', eventTab === 'withdrawn' + event.id ? 'tab-active' : '']" 
+                       @click="eventTab = 'withdrawn' + event.id">
+                      Retirados ({{ getWithdrawnForEvent(event.id).length }})
+                    </a>
+                    <a :class="['tab', eventTab === 'returned' + event.id ? 'tab-active' : '']" 
+                       @click="eventTab = 'returned' + event.id">
+                      Devolvidos ({{ getReturnedForEvent(event.id).length }})
+                    </a>
+                  </div>
+
+                  <!-- Reserved Tab -->
+                  <div v-if="eventTab === 'reserved' + event.id">
+                    <div v-if="getReservedForEvent(event.id).length === 0" class="text-center py-4 text-base-content/60">
+                      Nenhum equipamento reservado
+                    </div>
+                    <div v-else class="overflow-x-auto">
+                      <table class="table table-sm">
+                        <thead>
+                          <tr>
+                            <th>Tipo</th>
+                            <th>Equipamento/Bag</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(item, idx) in getReservedForEvent(event.id)" :key="'reserved-' + event.id + '-' + idx">
+                            <td>
+                              <div class="badge badge-info">{{ item.type === 'equipment' ? 'Equipamento' : 'Bag' }}</div>
+                            </td>
+                            <td>{{ item.type === 'equipment' ? getEquipmentNameById(item.equipment_id) : getBagNameById(item.bag_id) }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- Withdrawn Tab -->
+                  <div v-if="eventTab === 'withdrawn' + event.id">
+                    <div v-if="getWithdrawnForEvent(event.id).length === 0" class="text-center py-4 text-base-content/60">
+                      Nenhum equipamento retirado
+                    </div>
+                    <div v-else class="overflow-x-auto">
+                      <table class="table table-sm">
+                        <thead>
+                          <tr>
+                            <th>Tipo</th>
+                            <th>Equipamento/Bag</th>
+                            <th>Retirado por</th>
+                            <th>Data</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(item, idx) in getWithdrawnForEvent(event.id)" :key="'withdrawn-' + event.id + '-' + idx">
+                            <td>
+                              <div class="badge badge-warning">{{ item.type === 'equipment' ? 'Equipamento' : 'Bag' }}</div>
+                            </td>
+                            <td>{{ item.type === 'equipment' ? getEquipmentNameById(item.equipment_id) : getBagNameById(item.bag_id) }}</td>
+                            <td>{{ getUserNameById(item.user_id) }}</td>
+                            <td>{{ formatEventDate(item.created_at) }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- Returned Tab -->
+                  <div v-if="eventTab === 'returned' + event.id">
+                    <div v-if="getReturnedForEvent(event.id).length === 0" class="text-center py-4 text-base-content/60">
+                      Nenhum equipamento devolvido
+                    </div>
+                    <div v-else class="overflow-x-auto">
+                      <table class="table table-sm">
+                        <thead>
+                          <tr>
+                            <th>Tipo</th>
+                            <th>Equipamento/Bag</th>
+                            <th>Devolvido por</th>
+                            <th>Data</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(item, idx) in getReturnedForEvent(event.id)" :key="'returned-' + event.id + '-' + idx">
+                            <td>
+                              <div class="badge badge-success">{{ item.type === 'equipment' ? 'Equipamento' : 'Bag' }}</div>
+                            </td>
+                            <td>{{ item.type === 'equipment' ? getEquipmentNameById(item.equipment_id) : getBagNameById(item.bag_id) }}</td>
+                            <td>{{ getUserNameById(item.user_id) }}</td>
+                            <td>{{ formatEventDate(item.created_at) }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- Ações do Evento -->
+                  <div class="flex justify-end gap-2 pt-4 border-t border-base-300 mt-4">
+                    <button @click="editEvent(event)" class="btn btn-ghost btn-sm">
+                      ✏️ Editar
+                    </button>
+                    <button @click="deleteEvent(event.id)" class="btn btn-ghost btn-sm text-error">
+                      🗑️ Excluir
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -810,10 +929,13 @@ onMounted(async () => {
     appStore.fetchUsers(),
     appStore.fetchEvents(),
     appStore.fetchBags(),
+    appStore.fetchReservations(),
+    appStore.fetchTransactions(),
   ]);
 });
 
 const currentTab = ref("equipment");
+const eventTab = ref("");
 const showEquipmentModal = ref(false);
 const showUserModal = ref(false);
 const showEventModal = ref(false);
@@ -1478,6 +1600,68 @@ const getConditionText = (condition: string) => {
     damaged: "Danificado",
   };
   return texts[condition] || condition;
+};
+
+const getEventName = (eventId: string | undefined) => {
+  if (!eventId) return null;
+  const event = appStore.events.find((e) => e.id === eventId);
+  return event?.name || null;
+};
+
+// ===== EVENT TRANSACTIONS FUNCTIONS =====
+const getReservedForEvent = (eventId: string) => {
+  return appStore.reservations
+    .filter((r) => r.event_id === eventId && r.status === 'active')
+    .map((r) => ({
+      equipment_id: r.equipment_id,
+      bag_id: r.bag_id,
+      type: r.equipment_id ? 'equipment' : 'bag'
+    }));
+};
+
+const getWithdrawnForEvent = (eventId: string) => {
+  return appStore.transactions
+    .filter((t) => t.event_id === eventId && 
+      String(t.transaction_type).toLowerCase() === 'withdrawal' && 
+      t.status === 'completed')
+    .map((t) => ({
+      equipment_id: t.equipment_id,
+      bag_id: t.bag_id,
+      type: t.equipment_id ? 'equipment' : 'bag',
+      user_id: t.user_id,
+      created_at: t.created_at
+    }));
+};
+
+const getReturnedForEvent = (eventId: string) => {
+  return appStore.transactions
+    .filter((t) => t.event_id === eventId && 
+      String(t.transaction_type).toLowerCase() === 'return')
+    .map((t) => ({
+      equipment_id: t.equipment_id,
+      bag_id: t.bag_id,
+      type: t.equipment_id ? 'equipment' : 'bag',
+      user_id: t.user_id,
+      created_at: t.created_at
+    }));
+};
+
+const getEquipmentNameById = (equipmentId: string | undefined) => {
+  if (!equipmentId) return null;
+  const eq = appStore.equipment.find((e) => e.id === equipmentId);
+  return eq ? `${eq.code} - ${eq.name}` : null;
+};
+
+const getBagNameById = (bagId: string | undefined) => {
+  if (!bagId) return null;
+  const bag = appStore.bags.find((b) => b.id === bagId);
+  return bag ? `${bag.code} - ${bag.name}` : null;
+};
+
+const getUserNameById = (userId: string | undefined) => {
+  if (!userId) return null;
+  const user = appStore.users.find((u) => u.id === userId);
+  return user?.username || null;
 };
 
 const openNewBagModal = () => {

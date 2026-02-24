@@ -232,3 +232,27 @@ Sugestão para futuras melhorias:
 7. **Colaboradores** - Veja informações dos funcionários
 8. **Perfil** - Personalize seu perfil
 9. **Admin** - (Se for admin) Gerencie equipamentos e usuários
+
+---
+
+## API BFF (Backend for Frontend)
+
+O sistema utiliza Nuxt Nitro como proxy para a API FastAPI. Todos os endpoints estao em `/api/*`.
+
+### Endpoints Disponiveis
+
+| Modulo | Endpoints |
+|--------|-----------|
+| Auth | `/api/auth/login`, `/api/auth/register`, `/api/auth/me`, `/api/auth/logout` |
+| Equipment | CRUD completo em `/api/equipment/*` |
+| Events | CRUD completo em `/api/events/*` |
+| Reports | `/api/reports/*` (5 tipos de relatorio) |
+| Bags | CRUD completo em `/api/bags/*` |
+| Transactions | `/api/transactions/*` (retiradas/devolucoes) |
+| Reservations | `/api/reservations/*` |
+| Users | CRUD completo em `/api/users/*` |
+
+### Autenticacao
+
+- Token JWT em cookie HTTP-only (nao localStorage)
+- O middleware `server/middleware/auth.ts` valida o token automaticamente

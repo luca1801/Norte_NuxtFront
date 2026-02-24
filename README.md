@@ -7,7 +7,7 @@ Sistema completo de gerenciamento de ativos para empresas que alugam equipamento
 ### Autenticacao & Autorizacao
 - Sistema de Login e Cadastro
 - Dois tipos de usuarios (Admin e Funcionario)
-- Persistencia de sessao em localStorage
+- Persistencia de sessao em cookies HTTP-only (seguranca aumentada)
 - Protecao de rotas com middleware
 - Usuario de teste: **user: lucas | psw: admin**
 
@@ -111,26 +111,26 @@ npm run preview
 ## Credenciais de Teste
 
 **Administrador:**
-- Usuario: `lucas`
+- Usuário: `lucas`
 - Senha: `admin`
 
 ## Testes
 
 O projeto possui uma suíte completa de testes.
 
-### Testes Unitarios (Vitest) - 13 testes
+### Testes Unitários (Vitest) - 37 testes
 ```bash
 npm run test              # Executar testes
 npm run test:watch        # Modo watch
 npm run test:coverage     # Com cobertura
 ```
 
-### Testes E2E (Playwright) - 8 testes
+### Testes E2E (Playwright) - 2 testes
 ```bash
 npm run test:e2e          # Executar testes E2E
-npm run test:e2e:ui       # Interface grafica
-npm run test:e2e:debug    # Modo debug
-npm run test:e2e:report   # Ver relatorio HTML
+npm run test:e2e:ui      # Interface gráfica
+npm run test:e2e:debug   # Modo debug
+npm run test:e2e:report  # Ver relatório HTML
 ```
 
 ### Arquivos de Teste
@@ -138,12 +138,19 @@ npm run test:e2e:report   # Ver relatorio HTML
 tests/
 ├── unit/
 │   └── components/
-│       ├── FormInput.test.ts   # 6 testes
-│       ├── Modal.test.ts       # 3 testes
-│       └── StatCard.test.ts    # 4 testes
+│       ├── FormInput.test.ts
+│       ├── Modal.test.ts
+│       ├── StatCard.test.ts
+│       ├── FormSelect.test.ts
+│       └── FormTextarea.test.ts
+├── server/
+│   └── api/
+│       ├── auth.test.ts
+│       ├── equipment.test.ts
+│       └── events.test.ts
 e2e/
-├── auth.spec.ts                # 4 testes de autenticacao
-└── dashboard.spec.ts           # 4 testes do dashboard
+├── auth.spec.ts
+└── dashboard.spec.ts
 ```
 
 ## Estrutura do Projeto
@@ -198,11 +205,33 @@ nuxt-app/
 
 ## Integracao com Backend
 
-Este frontend esta integrado com a API FastAPI localizada em `/api`.
+Este frontend utiliza o padrao BFF (Backend for Frontend) com Nuxt Nitro como proxy para a API FastAPI.
 
-Configure a URL da API em `.env`:
+### Endpoints BFF Disponiveis
+
 ```
-NUXT_PUBLIC_API_URL=http://localhost:8000
+/api/auth/        - Autenticacao (login, register, me, logout)
+/api/equipment/   - Equipamentos (CRUD completo)
+/api/events/      - Eventos (CRUD completo)
+/api/reports/     - Relatorios (5 tipos)
+/api/bags/        - Bags/Malas (CRUD completo)
+/api/transactions/ - Transacoes/Retiradas/Devolucoes
+/api/reservations/ - Reservas de equipamentos
+/api/users/       - Gerenciamento de usuarios
+```
+
+Configure as variaveis de ambiente em `.env`:
+```bash
+# URL do Backend FastAPI (apenas server-side)
+NUXT_BACKEND_URL=http://localhost:8000
+
+# Deixar vazio para modo BFF
+NUXT_PUBLIC_API_URL=
+
+# Redis para cache (opcional)
+REDIS_URL=redis://localhost:6379
+
+NODE_ENV=development
 ```
 
 ## Proximas Melhorias

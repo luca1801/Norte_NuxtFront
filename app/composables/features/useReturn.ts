@@ -36,7 +36,7 @@ export const useReturn = () => {
 
   const recentReturns = computed(() => {
     return appStore.transactions
-      .filter((t) => t.transaction_type === "return")
+      .filter((t) => String(t.transaction_type).toLowerCase() === "return")
       .sort(
         (a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
@@ -176,6 +176,7 @@ export const useReturn = () => {
           user_id: authStore.user.id,
           transaction_type: "return" as TransactionType,
           scheduled_date: nowISO(),
+          return_condition: returnForm.value.status,
           notes: returnForm.value.notes
             ? `Bag: ${scannedBag.value.code} (${bagEquipments.value.length} itens). Status: ${returnForm.value.status}. ${returnForm.value.notes}`
             : `Bag: ${scannedBag.value.code} (${bagEquipments.value.length} itens). Status: ${returnForm.value.status}`,
@@ -187,6 +188,7 @@ export const useReturn = () => {
           user_id: authStore.user.id,
           transaction_type: "return" as TransactionType,
           scheduled_date: nowISO(),
+          return_condition: returnForm.value.status,
           notes: returnForm.value.notes
             ? `Status: ${returnForm.value.status}. ${returnForm.value.notes}`
             : `Status: ${returnForm.value.status}`,

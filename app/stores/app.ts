@@ -439,8 +439,7 @@ export const useAppStore = defineStore("app", {
       try {
         const transaction = await transactionService.create(data);
         this.transactions.push(transaction);
-        // Refresh equipment and bags to get updated status
-        await Promise.all([this.fetchEquipment(), this.fetchBags()]);
+        await Promise.all([this.fetchEquipment(), this.fetchBags(), this.fetchTransactions()]);
         return transaction;
       } catch (error: any) {
         console.error("Create transaction error:", error);
@@ -461,8 +460,8 @@ export const useAppStore = defineStore("app", {
       transaction_type?: TransactionType;
       scheduled_date?: string;
       notes?: string;
+      return_condition?: string;
     }) {
-      // Map frontend fields to API format
       const apiData: TransactionCreate = {
         equipment_id: data.equipmentId || data.equipment_id,
         bag_id: data.bagId || data.bag_id,
@@ -471,6 +470,7 @@ export const useAppStore = defineStore("app", {
         transaction_type: (data.type || data.transaction_type)!,
         scheduled_date: data.scheduled_date || new Date().toISOString(),
         notes: data.notes,
+        return_condition: data.return_condition,
       };
       return await this.createTransaction(apiData);
     },

@@ -39,7 +39,7 @@ export const useWithdrawal = () => {
 
   const recentWithdrawals = computed(() => {
     return appStore.transactions
-      .filter((t) => t.transaction_type === "withdrawal")
+      .filter((t) => String(t.transaction_type).toLowerCase() === "withdrawal")
       .sort(
         (a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),

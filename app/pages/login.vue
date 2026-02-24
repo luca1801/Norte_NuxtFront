@@ -176,6 +176,29 @@ const password = ref('')
 const error = ref('')
 const loading = ref(false)
 
+onMounted(async () => {
+  const isLoggedIn = useCookie('auth_check')
+  
+  if (isLoggedIn.value) {
+    authStore.isLoading = true
+    try {
+      await authStore.checkAuth()
+      if (authStore.isAuthenticated) {
+        router.push('/')
+        return
+      }
+    } catch {
+      authStore.logout()
+    } finally {
+      authStore.isLoading = false
+    }
+  }
+  
+  if (authStore.isAuthenticated) {
+    router.push('/')
+  }
+})
+
 const handleLogin = async () => {
   try {
     error.value = ''

@@ -1,14 +1,15 @@
 <template>
   <!-- Loading screen while checking authentication -->
-  <div v-if="authStore.isLoading" class="min-h-screen flex items-center justify-center bg-base-200"
-    :data-theme="currentTheme">
-    <div class="flex flex-col items-center gap-4">
-      <span class="loading loading-spinner loading-lg text-primary"></span>
-      <span class="text-base-content/60">Verificando autenticação...</span>
+  <ClientOnly>
+    <div v-if="authStore.isLoading" class="min-h-screen flex items-center justify-center bg-base-200"
+      :data-theme="currentTheme">
+      <div class="flex flex-col items-center gap-4">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+        <span class="text-base-content/60">Verificando autenticação...</span>
+      </div>
     </div>
-  </div>
 
-  <div v-else class="min-h-screen bg-base-200" :data-theme="currentTheme">
+    <div v-else class="min-h-screen bg-base-200" :data-theme="currentTheme">
     <!-- Mobile overlay (when sidebar is open) -->
     <div v-if="mobileSidebarOpen && !isLgUp" class="fixed inset-0 bg-black/40 z-[80]" aria-hidden="true"
       @click="mobileSidebarOpen = false"></div>
@@ -197,6 +198,7 @@
       </footer>
     </div>
   </div>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">

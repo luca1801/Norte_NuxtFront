@@ -107,6 +107,7 @@ export interface Bag {
   name: string;
   description?: string;
   status: BagStatus;
+  current_event_id?: string;
   created_at: string;
   updated_at: string;
 }
@@ -142,6 +143,7 @@ export interface Equipment {
   status: EquipmentStatus;
   condition: EquipmentCondition;
   bag_id?: string;
+  current_event_id?: string;
   location?: string;
   description?: string;
   created_at: string;
@@ -253,6 +255,7 @@ export interface TransactionCreate {
   transaction_type: TransactionType;
   scheduled_date: string;
   notes?: string;
+  return_condition?: string;
 }
 
 export interface TransactionUpdate {

@@ -145,7 +145,7 @@
                       {{ transaction.transaction_type?.toUpperCase() === 'WITHDRAWAL' ? 'Retirada' : 'Devolução' }}
                     </div>
                   </td>
-                  <td class="text-xs">{{ getEquipmentName(transaction.equipment_id) }}</td>
+                  <td class="text-xs">{{ getEquipmentName(transaction) }}</td>
                   <td class="text-xs">{{ getEventName(transaction.event_id) }}</td>
                 </tr>
               </tbody>
@@ -172,7 +172,8 @@ onMounted(async () => {
     appStore.fetchUsers(),
     appStore.fetchTransactions(),
     appStore.fetchEquipment(),
-    appStore.fetchEvents()
+    appStore.fetchEvents(),
+    appStore.fetchBags()
   ])
 })
 
@@ -224,9 +225,21 @@ const formatDateTime = (date: string | undefined) => {
   })
 }
 
-const getEquipmentName = (equipmentId: string | undefined) => {
-  if (!equipmentId) return 'Desconhecido'
-  return appStore.getEquipmentById(equipmentId)?.name || 'Desconhecido'
+const getEquipmentName = (transaction: any) => {
+  const equipmentId = transaction.equipment_id
+  const bagId = transaction.bag_id
+  
+  if (equipmentId) {
+    const equipment = appStore.getEquipmentById(equipmentId)
+    return equipment?.name || 'Desconhecido'
+  }
+  
+  if (bagId) {
+    const bag = appStore.getBagById(bagId)
+    return bag ? bag.name + ' (Bag)' : 'Desconhecido'
+  }
+  
+  return 'N/A'
 }
 
 const getEventName = (eventId: string | undefined) => {
