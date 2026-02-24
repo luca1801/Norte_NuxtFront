@@ -6,8 +6,10 @@ Sistema completo de gerenciamento de ativos para empresas que alugam equipamento
 
 ### Autenticacao & Autorizacao
 - Sistema de Login e Cadastro
-- Dois tipos de usuarios (Admin e Funcionario)
+- Tres tipos de usuarios (Admin, Manager, Operator)
 - Persistencia de sessao em cookies HTTP-only (seguranca aumentada)
+- Cookie de verificacao `auth_check` para integridade de sessao
+- Plugin de autenticacao para restauracao de estado
 - Protecao de rotas com middleware
 - Usuario de teste: **user: lucas | psw: admin**
 
@@ -59,10 +61,10 @@ Sistema completo de gerenciamento de ativos para empresas que alugam equipamento
 - Visualizacao de atividades recentes
 
 ### Painel Administrativo
-- CRUD de equipamentos
+- CRUD de equipamentos (com coluna Evento para status reserved/in_use)
+- CRUD de bags (com coluna Evento para status reserved/in_use)
 - CRUD de usuarios
-- Configuracoes do sistema
-- Exportacao de dados
+- Visualizacao de reservas, retiradas e devolucoes por evento
 - Zona de perigo para operacoes criticas
 - Acesso restrito a admins
 
@@ -111,26 +113,26 @@ npm run preview
 ## Credenciais de Teste
 
 **Administrador:**
-- Usuário: `lucas`
+- Usuario: `lucas`
 - Senha: `admin`
 
 ## Testes
 
-O projeto possui uma suíte completa de testes.
+O projeto possui uma suite completa de testes.
 
-### Testes Unitários (Vitest) - 37 testes
+### Testes Unitarios (Vitest) - 37 testes
 ```bash
 npm run test              # Executar testes
-npm run test:watch        # Modo watch
-npm run test:coverage     # Com cobertura
+npm run test:watch       # Modo watch
+npm run test:coverage    # Com cobertura
 ```
 
 ### Testes E2E (Playwright) - 2 testes
 ```bash
-npm run test:e2e          # Executar testes E2E
-npm run test:e2e:ui      # Interface gráfica
+npm run test:e2e         # Executar testes E2E
+npm run test:e2e:ui      # Interface grafica
 npm run test:e2e:debug   # Modo debug
-npm run test:e2e:report  # Ver relatório HTML
+npm run test:e2e:report  # Ver relatorio HTML
 ```
 
 ### Arquivos de Teste
@@ -158,29 +160,49 @@ e2e/
 ```
 nuxt-app/
 ├── app/
-│   ├── app.vue                 # Componente raiz
-│   ├── components/             # Componentes reutilizaveis
-│   ├── composables/            # Logica de dominio
-│   ├── layouts/                # Layouts de pagina
-│   ├── middleware/             # Middleware de rotas
-│   ├── pages/                  # Paginas da aplicacao
-│   ├── services/               # Chamadas API
-│   ├── stores/                 # Estado global (Pinia)
-│   └── utils/                  # Funcoes utilitarias
+│   ├── app.vue                   # Componente raiz
+│   ├── components/               # Componentes reutilizaveis
+│   ├── composables/              # Logica de dominio
+│   │   ├── core/                # Utilitarios core (useApi, useLoading)
+│   │   ├── domain/              # Dados de dominio (useEquipment, useEvents, etc)
+│   │   └── features/             # Funcionalidades (useWithdrawal, useReturn)
+│   ├── layouts/                  # Layouts de pagina
+│   ├── middleware/               # Middleware de rotas (auth.ts, admin.ts)
+│   ├── pages/                    # Paginas da aplicacao
+│   ├── plugins/                  # Plugins Nuxt (auth.ts - restauracao de sessao)
+│   ├── services/api/             # Chamadas API
+│   ├── stores/                   # Estado global (Pinia)
+│   │   ├── auth.ts              # Store de autenticacao
+│   │   └── app.ts               # Store de dados da aplicacao
+│   ├── types/                    # Tipos TypeScript
+│   │   └── index.ts             # Enums e interfaces
+│   └── utils/                    # Funcoes utilitarias
+├── server/                       # Nitro Server (BFF)
+│   ├── api/                     # Endpoints API
+│   ├── middleware/               # Middleware do servidor
+│   └── utils/                   # Utilitarios do servidor
 ├── tests/
-│   └── unit/                   # Testes unitarios
-├── e2e/                        # Testes E2E
+│   ├── unit/                    # Testes unitarios
+│   └── server/                  # Testes de API
+├── e2e/                         # Testes E2E
 ├── assets/
 │   └── css/
-│       └── main.css            # Estilos globais
-├── nuxt.config.ts              # Configuracao Nuxt
-├── tailwind.config.js          # Configuracao Tailwind
-├── vitest.config.ts            # Configuracao Vitest
-├── playwright.config.ts        # Configuracao Playwright
-└── package.json                # Dependencias
+│       └── main.css             # Estilos globais
+├── nuxt.config.ts               # Configuracao Nuxt
+├── tailwind.config.js           # Configuracao Tailwind
+├── vitest.config.ts             # Configuracao Vitest
+├── playwright.config.ts         # Configuracao Playwright
+└── package.json                 # Dependencias
 ```
 
 ## Funcionalidades Tecnicas
+
+### Sistema de Autenticacao
+- Cookie `auth_token` (HTTP-only) - Token JWT para API
+- Cookie `auth_check` (nao-HTTP) - Verificacao de sessao no frontend
+- Plugin `auth.ts` - Restaura estado de autenticacao ao iniciar app
+- Middleware `auth.ts` - Protege rotas automaticamente
+- Middleware `admin.ts` - Restringe acesso a administradores
 
 ### Componentes Reutilizaveis
 - FormInput, FormSelect, FormTextarea com validacao
@@ -207,17 +229,25 @@ nuxt-app/
 
 Este frontend utiliza o padrao BFF (Backend for Frontend) com Nuxt Nitro como proxy para a API FastAPI.
 
+### Arquitetura BFF
+
+```
+Frontend (Vue) → BFF (Nitro Server) → FastAPI Backend
+                       ↓
+              Cache em memoria (Nitro)
+```
+
 ### Endpoints BFF Disponiveis
 
 ```
-/api/auth/        - Autenticacao (login, register, me, logout)
-/api/equipment/   - Equipamentos (CRUD completo)
-/api/events/      - Eventos (CRUD completo)
-/api/reports/     - Relatorios (5 tipos)
-/api/bags/        - Bags/Malas (CRUD completo)
+/api/auth/          - Autenticacao (login, register, me, logout)
+/api/equipment/     - Equipamentos (CRUD completo)
+/api/events/        - Eventos (CRUD completo)
+/api/reports/       - Relatorios (5 tipos)
+/api/bags/         - Bags/Malas (CRUD completo)
 /api/transactions/ - Transacoes/Retiradas/Devolucoes
 /api/reservations/ - Reservas de equipamentos
-/api/users/       - Gerenciamento de usuarios
+/api/users/        - Gerenciamento de usuarios
 ```
 
 Configure as variaveis de ambiente em `.env`:
@@ -228,11 +258,37 @@ NUXT_BACKEND_URL=http://localhost:8000
 # Deixar vazio para modo BFF
 NUXT_PUBLIC_API_URL=
 
-# Redis para cache (opcional)
-REDIS_URL=redis://localhost:6379
-
 NODE_ENV=development
 ```
+
+## Modelos de Dados
+
+### Equipamento
+- id, code, name, category
+- status: available | reserved | in_use | maintenance | excluded
+- condition: excellent | good | fair | poor | damaged
+- bag_id, current_event_id, location, description
+
+### Bag
+- id, code, name, description
+- status: available | reserved | in_use | excluded
+- current_event_id
+
+### Evento
+- id, code, name, type, category
+- status: planned | confirmed | in_progress | completed | cancelled
+- start_date, end_date, owner_id, location
+
+### Transacao
+- id, equipment_id, bag_id, event_id, user_id
+- transaction_type: withdrawal | return
+- status: pending | confirmed | completed | cancelled
+- scheduled_date, actual_date, return_condition
+
+### Reserva
+- id, equipment_id, bag_id, event_id, reserved_by
+- status: active | completed | cancelled
+- start_date, end_date
 
 ## Proximas Melhorias
 
