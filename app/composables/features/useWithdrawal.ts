@@ -63,8 +63,6 @@ export const useWithdrawal = () => {
   };
 
   const handleScan = async (code: string) => {
-    console.log("[Withdrawal] handleScan called with raw code:", code);
-
     // Limpar código - remover chaves, aspas e espaços extras
     let cleanCode = code.trim();
 
@@ -81,7 +79,6 @@ export const useWithdrawal = () => {
       }
     }
 
-    console.log("[Withdrawal] Clean code:", cleanCode);
     const normalizedCode = cleanCode.toUpperCase();
 
     withdrawalError.value = "";
@@ -249,10 +246,6 @@ export const useWithdrawal = () => {
     withdrawalError.value = "";
     withdrawalWarning.value = "";
     currentStep.value = 3;
-    console.log(
-      "[Withdrawal] Equipment found, moving to step 3:",
-      equipment.code,
-    );
   };
 
   const confirmWithdrawal = async () => {

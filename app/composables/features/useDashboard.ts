@@ -35,6 +35,8 @@ export const useDashboard = () => {
   // Estado local
   const searchQuery = ref("");
   const expandedBags = ref(new Set<string>());
+  const currentPage = ref(1);
+  const itemsPerPage = ref(10);
 
   // Carregar todos os dados
   const loadData = async () => {
@@ -127,8 +129,42 @@ export const useDashboard = () => {
       });
     }
 
-    return movements.slice(0, 12);
+    return movements;
   });
+
+  // Total de itens filtrados (sem paginação)
+  const totalMovements = computed(() => filteredTransactions.value.length);
+
+  // Itens paginados
+  const paginatedTransactions = computed<Movement[]>(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return filteredTransactions.value.slice(start, end);
+  });
+
+  // Total de páginas
+  const totalPages = computed(() => {
+    return Math.ceil(totalMovements.value / itemsPerPage.value);
+  });
+
+  // Funções de navegação
+  const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+      currentPage.value++;
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage.value > 1) {
+      currentPage.value--;
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages.value) {
+      currentPage.value = page;
+    }
+  };
 
   // Toggle para expandir bag
   const toggleExpandBag = (transactionId: string) => {
@@ -390,6 +426,8 @@ export const useDashboard = () => {
     // Estado
     searchQuery,
     expandedBags,
+    currentPage,
+    itemsPerPage,
 
     // Stats
     equipmentStats,
@@ -397,11 +435,19 @@ export const useDashboard = () => {
 
     // Dados
     filteredTransactions,
-    upcomingEvents,
+    paginatedTransactions,
+    totalMovements,
+    totalPages,
 
     // Actions
     loadData,
     toggleExpandBag,
+    nextPage,
+    prevPage,
+    goToPage,
+
+    // Dados
+    upcomingEvents,
 
     // Legacy helpers (for Transaction)
     getItemName,

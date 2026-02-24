@@ -49,7 +49,7 @@
         <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
           <h2 class="card-title">
             Últimas Movimentações
-            <div class="badge badge-secondary">{{ filteredTransactions.length }}</div>
+            <div class="badge badge-secondary">{{ totalMovements }}</div>
           </h2>
 
           <!-- Campo de Busca -->
@@ -78,7 +78,7 @@
               </tr>
             </thead>
             <tbody>
-              <template v-for="movement in filteredTransactions" :key="movement.id">
+              <template v-for="movement in paginatedTransactions" :key="movement.id">
                 <!-- Linha principal -->
                 <tr class="hover">
                   <td>
@@ -151,7 +151,7 @@
               </template>
 
               <!-- Mensagem quando não há transações -->
-              <tr v-if="filteredTransactions.length === 0">
+              <tr v-if="totalMovements === 0">
                 <td colspan="7" class="text-center py-8 text-base-content/60">
                   {{ searchQuery ? 'Nenhuma movimentação encontrada para a busca.' : 'Nenhuma movimentação registrada.'
                   }}
@@ -159,6 +159,21 @@
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- Paginação -->
+        <div v-if="totalPages > 1" class="flex justify-center items-center gap-4 mt-4">
+          <button @click="prevPage" :disabled="currentPage === 1" 
+            class="btn btn-sm btn-outline" :class="{ 'btn-disabled': currentPage === 1 }">
+            ← Anterior
+          </button>
+          <span class="text-sm text-base-content/70">
+            Página {{ currentPage }} de {{ totalPages }}
+          </span>
+          <button @click="nextPage" :disabled="currentPage === totalPages" 
+            class="btn btn-sm btn-outline" :class="{ 'btn-disabled': currentPage === totalPages }">
+            Próxima →
+          </button>
         </div>
       </div>
     </div>
@@ -210,6 +225,7 @@
 import { useDashboard } from "~/composables/features/useDashboard";
 import { formatDateTimeBR } from "~/utils/dateUtils";
 import { useUserAvatar } from "~/composables/useUserAvatar";
+import { watch } from "vue";
 
 definePageMeta({
   middleware: ["auth"],
@@ -225,9 +241,17 @@ const {
   equipmentStats,
   eventStats,
   filteredTransactions,
-  upcomingEvents,
+  paginatedTransactions,
+  totalMovements,
+  totalPages,
+  currentPage,
+  itemsPerPage,
   loadData,
   toggleExpandBag,
+  nextPage,
+  prevPage,
+  goToPage,
+  upcomingEvents,
   getItemName,
   getItemCode,
   getBagEquipments,
@@ -251,6 +275,11 @@ const {
 // Carregar dados
 onMounted(loadData);
 onActivated(loadData);
+
+// Reset página quando buscar
+watch(searchQuery, () => {
+  currentPage.value = 1;
+});
 
 // Navegação
 const navigateToEvent = (eventId: string) => {

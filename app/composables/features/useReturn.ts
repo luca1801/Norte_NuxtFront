@@ -60,8 +60,6 @@ export const useReturn = () => {
   };
 
   const handleScan = async (code: string) => {
-    console.log("[Return] handleScan called with raw code:", code);
-
     // Limpar código
     let cleanCode = code.trim();
 
@@ -76,8 +74,6 @@ export const useReturn = () => {
         cleanCode = cleanCode.replace(/[{}'"\[\]]/g, "").trim();
       }
     }
-
-    console.log("[Return] Clean code:", cleanCode);
 
     const normalizedCode = cleanCode.toUpperCase();
     returnError.value = "";
@@ -111,7 +107,6 @@ export const useReturn = () => {
       scannedEquipment.value = inUse[0] || null;
       returnError.value = "";
       currentStep.value = 3;
-      console.log("[Return] Bag found, moving to step 3:", bag.code);
       return;
     }
 
@@ -160,7 +155,6 @@ export const useReturn = () => {
     bagEquipments.value = [];
     returnError.value = "";
     currentStep.value = 3;
-    console.log("[Return] Equipment found, moving to step 3:", equipment.code);
   };
 
   const confirmReturn = async () => {

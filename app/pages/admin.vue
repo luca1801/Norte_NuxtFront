@@ -5,8 +5,9 @@
     <!-- Admin Tabs -->
     <div class="tabs tabs-boxed">
       <a v-for="tab in adminTabs" :key="tab.value" @click="currentTab = tab.value"
-        :class="['tab', currentTab === tab.value ? 'tab-active' : '']">
-        {{ tab.label }}
+        :class="['tab gap-2', currentTab === tab.value ? 'tab-active' : '']">
+        <span class="text-xl">{{ tab.icon }}</span>
+        <span>{{ tab.label }}</span>
       </a>
     </div>
 
@@ -16,7 +17,7 @@
         <h2 class="text-2xl font-bold">Gerenciar Equipamentos</h2>
         <button @click="openNewEquipmentModal"
           class="btn btn-primary btn-md gap-2 shadow-lg hover:shadow-xl transition-all">
-          📦 Novo Equipamento
+          🎤 Novo Equipamento
         </button>
       </div>
 
@@ -72,8 +73,8 @@
                     </div>
                   </td>
                   <td>
-                    <div v-if="['in_use', 'reserved'].includes(equipment.status) && equipment.current_event_id" 
-                         class="badge badge-warning gap-1">
+                    <div v-if="['in_use', 'reserved'].includes(equipment.status) && equipment.current_event_id"
+                      class="badge badge-warning gap-1">
                       <span>📅</span>
                       <span>{{ getEventName(equipment.current_event_id) }}</span>
                     </div>
@@ -101,8 +102,11 @@
     <div v-if="currentTab === 'bags'" class="space-y-6">
       <div class="flex justify-between items-center">
         <h2 class="text-2xl font-bold">Gerenciar Bags</h2>
-        <button @click="openNewBagModal" class="btn btn-primary btn-md gap-2 shadow-lg hover:shadow-xl transition-all">
-          👜 Nova Bag
+        <button @click="openNewBagModal"
+          class="btn btn-primary btn-md gap-2 shadow-lg text-xl hover:shadow-xl transition-all">
+          <img src="https://img.icons8.com/?size=100&id=4vFP3CsUgOmd&format=png&color=000000" alt="Bag Icon"
+            class="w-6 h-6" />
+          Nova Bag
         </button>
       </div>
 
@@ -133,8 +137,9 @@
                 <div class="flex justify-between items-center pr-8">
                   <div class="flex items-center gap-4">
                     <div class="avatar placeholder">
-                      <div class="bg-primary text-primary-content rounded-lg w-12">
-                        <span class="text-lg">📦</span>
+                      <div class="bg-primary text-primary-content rounded-xl w-8 h-8">
+                        <img src="https://img.icons8.com/?size=100&id=4vFP3CsUgOmd&format=png&color=000000"
+                          alt="Bag Icon" />
                       </div>
                     </div>
                     <div>
@@ -149,8 +154,8 @@
                     <div class="badge" :class="getBagStatusClass(bag.status)">
                       {{ getBagStatusText(bag.status) }}
                     </div>
-                    <div v-if="['in_use', 'reserved'].includes(bag.status) && bag.current_event_id" 
-                         class="badge badge-warning gap-1">
+                    <div v-if="['in_use', 'reserved'].includes(bag.status) && bag.current_event_id"
+                      class="badge badge-warning gap-1">
                       <span>📅</span>
                       <span>{{ getEventName(bag.current_event_id) }}</span>
                     </div>
@@ -291,23 +296,24 @@
               <div class="collapse-content">
                 <div class="pt-4">
                   <div class="tabs tabs-boxed mb-4">
-                    <a :class="['tab', eventTab === 'reserved' + event.id ? 'tab-active' : '']" 
-                       @click="eventTab = 'reserved' + event.id">
+                    <a :class="['tab', eventTab === 'reserved' + event.id ? 'tab-active' : '']"
+                      @click="eventTab = 'reserved' + event.id">
                       Reservados ({{ getReservedForEvent(event.id).length }})
                     </a>
-                    <a :class="['tab', eventTab === 'withdrawn' + event.id ? 'tab-active' : '']" 
-                       @click="eventTab = 'withdrawn' + event.id">
+                    <a :class="['tab', eventTab === 'withdrawn' + event.id ? 'tab-active' : '']"
+                      @click="eventTab = 'withdrawn' + event.id">
                       Retirados ({{ getWithdrawnForEvent(event.id).length }})
                     </a>
-                    <a :class="['tab', eventTab === 'returned' + event.id ? 'tab-active' : '']" 
-                       @click="eventTab = 'returned' + event.id">
+                    <a :class="['tab', eventTab === 'returned' + event.id ? 'tab-active' : '']"
+                      @click="eventTab = 'returned' + event.id">
                       Devolvidos ({{ getReturnedForEvent(event.id).length }})
                     </a>
                   </div>
 
                   <!-- Reserved Tab -->
                   <div v-if="eventTab === 'reserved' + event.id">
-                    <div v-if="getReservedForEvent(event.id).length === 0" class="text-center py-4 text-base-content/60">
+                    <div v-if="getReservedForEvent(event.id).length === 0"
+                      class="text-center py-4 text-base-content/60">
                       Nenhum equipamento reservado
                     </div>
                     <div v-else class="overflow-x-auto">
@@ -319,11 +325,14 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="(item, idx) in getReservedForEvent(event.id)" :key="'reserved-' + event.id + '-' + idx">
+                          <tr v-for="(item, idx) in getReservedForEvent(event.id)"
+                            :key="'reserved-' + event.id + '-' + idx">
                             <td>
-                              <div class="badge badge-info">{{ item.type === 'equipment' ? 'Equipamento' : 'Bag' }}</div>
+                              <div class="badge badge-info">{{ item.type === 'equipment' ? 'Equipamento' : 'Bag' }}
+                              </div>
                             </td>
-                            <td>{{ item.type === 'equipment' ? getEquipmentNameById(item.equipment_id) : getBagNameById(item.bag_id) }}</td>
+                            <td>{{ item.type === 'equipment' ? getEquipmentNameById(item.equipment_id) :
+                              getBagNameById(item.bag_id) }}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -332,7 +341,8 @@
 
                   <!-- Withdrawn Tab -->
                   <div v-if="eventTab === 'withdrawn' + event.id">
-                    <div v-if="getWithdrawnForEvent(event.id).length === 0" class="text-center py-4 text-base-content/60">
+                    <div v-if="getWithdrawnForEvent(event.id).length === 0"
+                      class="text-center py-4 text-base-content/60">
                       Nenhum equipamento retirado
                     </div>
                     <div v-else class="overflow-x-auto">
@@ -346,11 +356,14 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="(item, idx) in getWithdrawnForEvent(event.id)" :key="'withdrawn-' + event.id + '-' + idx">
+                          <tr v-for="(item, idx) in getWithdrawnForEvent(event.id)"
+                            :key="'withdrawn-' + event.id + '-' + idx">
                             <td>
-                              <div class="badge badge-warning">{{ item.type === 'equipment' ? 'Equipamento' : 'Bag' }}</div>
+                              <div class="badge badge-warning">{{ item.type === 'equipment' ? 'Equipamento' : 'Bag' }}
+                              </div>
                             </td>
-                            <td>{{ item.type === 'equipment' ? getEquipmentNameById(item.equipment_id) : getBagNameById(item.bag_id) }}</td>
+                            <td>{{ item.type === 'equipment' ? getEquipmentNameById(item.equipment_id) :
+                              getBagNameById(item.bag_id) }}</td>
                             <td>{{ getUserNameById(item.user_id) }}</td>
                             <td>{{ formatEventDate(item.created_at) }}</td>
                           </tr>
@@ -361,7 +374,8 @@
 
                   <!-- Returned Tab -->
                   <div v-if="eventTab === 'returned' + event.id">
-                    <div v-if="getReturnedForEvent(event.id).length === 0" class="text-center py-4 text-base-content/60">
+                    <div v-if="getReturnedForEvent(event.id).length === 0"
+                      class="text-center py-4 text-base-content/60">
                       Nenhum equipamento devolvido
                     </div>
                     <div v-else class="overflow-x-auto">
@@ -375,11 +389,14 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="(item, idx) in getReturnedForEvent(event.id)" :key="'returned-' + event.id + '-' + idx">
+                          <tr v-for="(item, idx) in getReturnedForEvent(event.id)"
+                            :key="'returned-' + event.id + '-' + idx">
                             <td>
-                              <div class="badge badge-success">{{ item.type === 'equipment' ? 'Equipamento' : 'Bag' }}</div>
+                              <div class="badge badge-success">{{ item.type === 'equipment' ? 'Equipamento' : 'Bag' }}
+                              </div>
                             </td>
-                            <td>{{ item.type === 'equipment' ? getEquipmentNameById(item.equipment_id) : getBagNameById(item.bag_id) }}</td>
+                            <td>{{ item.type === 'equipment' ? getEquipmentNameById(item.equipment_id) :
+                              getBagNameById(item.bag_id) }}</td>
                             <td>{{ getUserNameById(item.user_id) }}</td>
                             <td>{{ formatEventDate(item.created_at) }}</td>
                           </tr>
@@ -1074,12 +1091,12 @@ const filteredUsers = computed(() => {
 });
 
 const adminTabs = [
-  { value: "equipment", label: "📦 Equipamentos" },
-  { value: "bags", label: "👜 Bags" },
-  { value: "events", label: "📅 Eventos" },
-  { value: "users", label: "👥 Usuários" },
-  { value: "audit", label: "📋 Auditoria" },
-  { value: "settings", label: "⚙️ Configurações" },
+  { value: "equipment", label: "Equipamentos", icon: "🎤" },
+  { value: "bags", label: "Bags", icon: "🧳" },
+  { value: "events", label: "Eventos", icon: "📅" },
+  { value: "users", label: "Usuários", icon: "👥" },
+  { value: "audit", label: "Auditoria", icon: "📋" },
+  { value: "settings", label: "Configurações", icon: "⚙️" },
 ];
 
 const equipmentForm = ref({
@@ -1621,8 +1638,8 @@ const getReservedForEvent = (eventId: string) => {
 
 const getWithdrawnForEvent = (eventId: string) => {
   return appStore.transactions
-    .filter((t) => t.event_id === eventId && 
-      String(t.transaction_type).toLowerCase() === 'withdrawal' && 
+    .filter((t) => t.event_id === eventId &&
+      String(t.transaction_type).toLowerCase() === 'withdrawal' &&
       t.status === 'completed')
     .map((t) => ({
       equipment_id: t.equipment_id,
@@ -1635,7 +1652,7 @@ const getWithdrawnForEvent = (eventId: string) => {
 
 const getReturnedForEvent = (eventId: string) => {
   return appStore.transactions
-    .filter((t) => t.event_id === eventId && 
+    .filter((t) => t.event_id === eventId &&
       String(t.transaction_type).toLowerCase() === 'return')
     .map((t) => ({
       equipment_id: t.equipment_id,
